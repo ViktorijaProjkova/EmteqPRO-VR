@@ -1,23 +1,14 @@
-# EmteqPRO-VR: Valence and Arousal Analysis
+# EmteqPRO-VR: Valence and Arousal Prediction
 
-This repository contains the analysis pipeline for the EmteqPRO-VR project, focused on analysing and predicting **valence** and **arousal** from EmteqPRO sensor data collected during VR-based empathy scenarios.
+This repository contains the analysis pipeline for predicting valence and arousal from multimodal EmteqPRO sensor data collected during VR-based empathy scenarios.
 
-The project includes data understanding, feature extraction, exploratory analysis, statistical analysis, and machine learning models for valence and arousal prediction.
-
----
+The project includes exploratory data analysis, statistical analysis, feature extraction, and participant-independent machine learning evaluation. The final modelling approach uses modality-level stacking to combine information from facial activation, EMG activation, expression intensity, breathing, and heart-rate-variability-related features.
 
 ## Project Overview
 
-The aim of this project is to investigate whether features extracted from EmteqPRO sensor recordings can be used to analyse and predict participants’ emotional responses during VR experiences.
+Virtual reality provides a controlled environment for eliciting emotional responses, while wearable sensors enable continuous tracking of physiological and facial activity. This project investigates whether multimodal EmteqPRO features can be used to analyse and predict self-reported valence and arousal during empathy-inducing VR scenes.
 
-The emotional response is represented through two target dimensions:
-
-* **Valence** – how positive or negative the emotional response is
-* **Arousal** – how calm or activated the emotional response is
-
-The analysis is based on participant-level recordings from empathy-related VR scenes. The extracted features are used for both statistical exploration and machine learning classification.
-
----
+The analysis focuses on scene-level affective responses, statistical differences between empathy scenes, and low-versus-high valence and arousal prediction using participant-independent evaluation.
 
 ## Repository Structure
 
@@ -29,6 +20,7 @@ EmteqPRO-VR/
 ├── valence_arousal_analysis.ipynb
 ├── statistical_analysis.ipynb
 ├── ML_arousal_valence_prediction.ipynb
+├── modality_stacking_models.ipynb
 │
 ├── ml_results/
 ├── ml_global_figures/
@@ -37,179 +29,71 @@ EmteqPRO-VR/
 └── README.md
 ```
 
----
-
 ## Notebooks
 
-### `01_data_understanding.ipynb`
+### 01_data_understanding.ipynb
 
-This notebook contains the initial exploration of the dataset.
+Performs the initial inspection of the dataset, participant recordings, metadata, available sensor files, missing values, and inconsistencies.
 
-It includes:
+### feature_extraction.ipynb
 
-* inspection of the available participant data
-* checking the file structure and available recordings
-* understanding sensor columns and metadata
-* identifying missing values and inconsistencies
-* preparing the logic for later feature extraction
+Extracts scene-level features from the EmteqPRO recordings. The extracted features represent facial activation, EMG activation, expression intensity, breathing, and heart-rate-variability-related signals.
 
----
+### valence_arousal_analysis.ipynb
 
-### `feature_extraction.ipynb`
+Explores the self-reported valence and arousal targets, their distributions across scenes and participants, and the preparation of binary low-versus-high classification targets.
 
-This notebook performs feature extraction from the EmteqPRO recordings.
+### statistical_analysis.ipynb
 
-It creates the processed dataset used for later statistical analysis and machine learning. The feature extraction focuses on video-level segments related to the VR empathy scenes.
+Performs statistical analysis of self-reported valence and arousal across the empathy scenes. Friedman and Wilcoxon signed-rank tests are used to identify significant scene-dependent differences.
 
-Main steps include:
+### ML_arousal_valence_prediction.ipynb
 
-* loading participant recordings
-* identifying the relevant VR scenes
-* extracting features from sensor signals
-* keeping the selected minimum and maximum features
-* preparing valence and arousal labels
-* saving the processed feature dataset
+Contains the global machine learning analysis for binary valence and arousal prediction, including preprocessing, model comparison, and Leave-One-Participant-Out evaluation.
 
-The extracted dataset is later used as input for statistical analysis and machine learning.
+### modality_stacking_models.ipynb
 
----
-
-### `valence_arousal_analysis.ipynb`
-
-This notebook contains exploratory analysis of valence and arousal.
-
-It focuses on understanding the distribution and behaviour of the target variables.
-
-It includes:
-
-* analysis of valence and arousal labels
-* comparison between participants and scenarios
-* visualisation of label distributions
-* inspection of potential class imbalance
-* preparation of binary valence and arousal targets
-
----
-
-### `statistical_analysis.ipynb`
-
-This notebook contains statistical analysis of the extracted features.
-
-It investigates whether the extracted EmteqPRO features show meaningful differences across valence and arousal conditions.
-
-It includes:
-
-* descriptive statistics
-* comparison of feature values across emotional states
-* analysis of feature relevance
-* visual exploration of patterns in the data
-
----
-
-### `ML_arousal_valence_prediction.ipynb`
-
-This notebook contains the machine learning pipeline for valence and arousal prediction.
-
-The notebook trains and evaluates models for predicting binary valence and binary arousal classes.
-
-The analysis includes:
-
-* preprocessing of the extracted feature dataset
-* creation of binary valence and arousal targets
-* feature engineering from paired minimum and maximum columns
-* handling class imbalance
-* feature selection
-* training multiple classification models
-* participant-aware evaluation
-* comparison of global models
-* confusion matrices for the best-performing models
-* participant-level result inspection
-
-The evaluated models include classical machine learning classifiers such as:
-
-* Logistic Regression
-* Support Vector Machine
-* Random Forest
-* Gradient Boosting
-* k-Nearest Neighbors
-* Decision Tree
-* Gaussian Naive Bayes
-* SGD Classifier
-* XGBoost, when available
-
----
-
-## Output Folders
-
-### `ml_results/`
-
-This folder contains saved machine learning results, including model performance tables and prediction outputs.
-
-### `ml_global_figures/`
-
-This folder contains generated figures from the global model analysis, including performance plots and confusion matrices.
-
----
-
-## General Pipeline
-
-The full workflow follows these steps:
-
-1. **Data understanding**
-   The dataset, available files, sensor columns, and participant recordings are inspected.
-
-2. **Feature extraction**
-   Video-level EmteqPRO features are extracted from the relevant VR empathy scenes.
-
-3. **Valence and arousal analysis**
-   The target labels are explored and binary classification targets are prepared.
-
-4. **Statistical analysis**
-   Feature behaviour is analysed and patterns across emotional conditions are compared.
-
-5. **Machine learning modelling**
-   Models are trained and evaluated for valence and arousal prediction.
-
-6. **Result visualisation**
-   Model comparison plots, confusion matrices, and participant-level outputs are generated and saved.
-
----
+Contains the final modality-level stacking approach. Separate first-layer models are trained on modality-specific feature groups, and their predicted probabilities are combined using a second-layer meta-classifier.
 
 ## Machine Learning Evaluation
 
-The machine learning analysis focuses on predicting:
+The final prediction task was formulated as binary classification for both valence and arousal. Medium responses were excluded in order to focus on clearer low-versus-high affective contrasts.
 
-* binary valence
-* binary arousal
+Model evaluation was performed using Leave-One-Participant-Out cross-validation. In each fold, all samples from one participant were held out for testing, while training was performed using the remaining participants. This strategy evaluates generalization to unseen participants and reduces participant-level data leakage.
 
-The evaluation is designed to account for participant-level differences. This is important because emotional responses can vary strongly between participants, especially in VR-based experiments.
+The main evaluation metrics were accuracy, balanced accuracy, macro F1-score, and weighted F1-score. Due to class imbalance, balanced accuracy and macro F1-score were used as the main comparison metrics.
 
-The main evaluation outputs include:
+## Final Modelling Approach
 
-* balanced accuracy
-* macro F1-score
-* confusion matrices
-* model comparison plots
-* participant-level prediction analysis
+The final modelling approach is based on modality-level stacking. In the first layer, separate models are trained on modality-specific feature groups:
 
-Balanced accuracy and macro F1-score are used because the target classes is imbalanced.
+- facial activation
+- EMG activation
+- expression intensity
+- breathing-related features
+- heart-rate-variability-related features
 
----
+Each modality-specific model outputs a predicted probability for the high class. These probabilities are then used as input to a second-layer meta-classifier, which produces the final low-versus-high prediction.
+
+## Results Summary
+
+The best valence stacking configuration achieved a balanced accuracy of approximately 0.705 and a macro F1-score of approximately 0.683.
+
+The best arousal stacking configuration achieved approximately 0.462 for both balanced accuracy and macro F1-score.
+
+These results indicate that valence was predicted more reliably across unseen participants, while arousal remained more challenging to generalize from the extracted scene-level features.
 
 ## Notes on Data
 
 The raw participant data is not included in this repository.
 
-The notebooks are intended to be run with the original EmteqPRO-VR dataset available locally in the expected project structure.
-
-Large raw data files, generated outputs, and local system files should not be committed unless they are needed for reproducibility.
-
----
+The notebooks are intended to be run with the original EmteqPRO-VR dataset available locally in the expected project structure. Large raw data files, generated outputs, and local system files should not be committed unless required for reproducibility.
 
 ## Requirements
 
 The project is implemented in Python using Jupyter notebooks.
 
-Main Python libraries used across the analysis include:
+Main libraries used:
 
 ```text
 pandas
@@ -221,13 +105,11 @@ imbalanced-learn
 xgboost
 ```
 
-To install the required packages:
+Install the required packages using:
 
 ```bash
 pip install pandas numpy matplotlib seaborn scikit-learn imbalanced-learn xgboost
 ```
-
----
 
 ## How to Run
 
@@ -239,17 +121,13 @@ Run the notebooks in the following order:
 3. valence_arousal_analysis.ipynb
 4. statistical_analysis.ipynb
 5. ML_arousal_valence_prediction.ipynb
+6. modality_stacking_models.ipynb
 ```
 
-The machine learning notebook depends on the processed dataset created during feature extraction.
-
----
+The machine learning notebooks depend on the processed feature dataset created during feature extraction.
 
 ## Project Status
 
-This repository contains the completed analysis workflow for the valence and arousal prediction task.
+This repository contains the completed analysis workflow for valence and arousal prediction from EmteqPRO sensor data collected during VR-based empathy scenarios.
 
-The current results focus on global machine learning models and participant-level inspection, with the possibility of further extending the work toward more personalised modelling strategies.
-
----
-
+The final analysis focuses on participant-independent prediction using modality-level stacking and Leave-One-Participant-Out cross-validation.
