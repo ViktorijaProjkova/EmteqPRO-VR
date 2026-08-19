@@ -15,11 +15,9 @@ The analysis focuses on scene-level affective responses, statistical differences
 ```text
 EmteqPRO-VR/
 │
-├── 01_data_understanding.ipynb
 ├── feature_extraction.ipynb
 ├── valence_arousal_analysis.ipynb
 ├── statistical_analysis.ipynb
-├── ML_arousal_valence_prediction.ipynb
 ├── modality_stacking_models.ipynb
 │
 ├── ml_results/
